@@ -13,9 +13,13 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(email, password);
-    } catch (err: any) {
+    } catch (err: unknown) {
+    if (err instanceof Error) {
       setError(err.message);
+    } else {
+      setError("Error desconocido");
     }
+}
   };
 
   return (

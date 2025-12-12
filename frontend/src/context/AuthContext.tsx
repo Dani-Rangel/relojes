@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+// src/context/AuthContext.tsx
+
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export interface User {
@@ -20,53 +22,57 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('auth_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('auth_token');
+  });
+
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('auth_user');
-    
-    if (savedToken && savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setToken(savedToken);
-        setUser(parsedUser);
-      } catch (e) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (user && !loading) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, loading, navigate]);
-
+  // 🔥 LOGIN — Maneja login + persistencia + navegación inteligente
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+    setLoading(true);
 
-    if (!response.ok) {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Credenciales incorrectas');
+      }
+
       const data = await response.json();
-      throw new Error(data.error || 'Credenciales incorrectas');
-    }
+      const { token, user: userData } = data;
 
-    const data = await response.json();
-    localStorage.setItem('auth_token', data.token);
-    localStorage.setItem('auth_user', JSON.stringify(data.user));
-    setToken(data.token);
-    setUser(data.user);
+      // Persistencia
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      setToken(token);
+      setUser(userData);
+
+      // Redirección después de login
+      const from = sessionStorage.getItem('from') || '/dashboard';
+      sessionStorage.removeItem('from');
+
+      navigate(from, { replace: true });
+
+    } catch (err: any) {
+      throw new Error(err.message || 'Error en login');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // 🔥 LOGOUT — Limpia todo y redirige
   const logout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
@@ -84,8 +90,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider');
-  }
+  if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider');
   return context;
 };

@@ -1,13 +1,15 @@
+// src/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { CarritoProvider } from "./context/CarritoContext";
+
+// ✅ Solo si usas @react-pdf/renderer en el futuro:
+// import { Buffer } from 'buffer';
+// globalThis.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <CarritoProvider>
-      <App />
-    </CarritoProvider>
+    <App />
   </React.StrictMode>
 );
