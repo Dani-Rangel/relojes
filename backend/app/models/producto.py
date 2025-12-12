@@ -15,5 +15,6 @@ class Producto(Base):
     precio = Column(Float, nullable=False)
     stock = Column(Integer, default=0)
     id_proveedor = Column(Integer, ForeignKey("proveedores.id"))
+    imagen_url = Column(String(255), nullable=True)
 
     proveedor = relationship("Proveedor", back_populates="productos")

@@ -5,10 +5,15 @@ import enum
 
 class CargoEnum(enum.Enum):
     VENDEDOR = "vendedor"
-    TECNICO = "tecnico"
+    ALMACENISTA = "almacenista" 
     GERENTE = "gerente"
     ADMINISTRADOR = "administrador"
-    ALMACENISTA = "almacenista"
+
+class EstadoEmpleadoEnum(enum.Enum):
+    PENDIENTE = "pendiente"      # ✅ Nuevo: para aprobación
+    APROBADO = "aprobado"
+    RECHAZADO = "rechazado"
+    INACTIVO = "inactivo"
 
 class Empleado(Base):
     __tablename__ = "empleados"
@@ -22,5 +27,9 @@ class Empleado(Base):
     activo = Column(Boolean, default=True)
     email = Column(String(100), unique=True, index=True)
     password_hash = Column(String(128), nullable=False)
+    
+    # ✅ Nuevo: estado de aprobación
+    estado = Column(Enum(EstadoEmpleadoEnum), default=EstadoEmpleadoEnum.PENDIENTE)
 
     pedidos = relationship("Pedido", back_populates="empleado")
+    facturas = relationship("Factura", back_populates="empleado")

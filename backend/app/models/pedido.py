@@ -24,3 +24,5 @@ class Pedido(Base):
 
     cliente = relationship("Cliente", back_populates="pedidos")
     empleado = relationship("Empleado", back_populates="pedidos")
+    factura = relationship("Factura", back_populates="pedido", uselist=False)
+    

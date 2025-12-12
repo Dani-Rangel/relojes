@@ -16,3 +16,4 @@ class Cliente(Base):
     password_hash = Column(String(128))
 
     pedidos = relationship("Pedido", back_populates="cliente")
+    facturas = relationship("Factura", back_populates="cliente")

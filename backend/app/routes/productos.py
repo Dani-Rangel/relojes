@@ -24,6 +24,7 @@ def get_productos():
                 "material_correa": p.material_correa,
                 "precio": float(p.precio),
                 "stock": p.stock,
+                "imagen_url": p.imagen_url,
                 "proveedor": {
                     "nombre": p.proveedor.nombre_empresa,
                     "contacto": p.proveedor.contacto,

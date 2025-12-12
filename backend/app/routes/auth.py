@@ -24,10 +24,14 @@ def create_token(user_data: dict) -> str:
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
+
+# ✔ Health
 @auth_bp.route('/api/health', methods=['GET'])
 def health():
     return jsonify({"status": "ok", "service": "Relojes API"})
 
+
+# ✔ Login
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -65,6 +69,8 @@ def login():
         print(f"❌ ERROR EN /api/login: {type(e).__name__}: {e}")
         return jsonify({"error": "Error interno"}), 500
 
+
+# ✔ Registro de cliente
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
     try:
@@ -112,6 +118,8 @@ def register():
         print(f"❌ ERROR EN /api/register: {e}")
         return jsonify({"error": "Error interno"}), 500
 
+
+# ✔ Registro de empleado
 @auth_bp.route('/api/register/empleado', methods=['POST'])
 def register_empleado():
     try:
