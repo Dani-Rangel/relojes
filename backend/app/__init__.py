@@ -11,6 +11,7 @@ def create_app():
     from .routes.pedidos import pedidos_bp
     from .routes.facturas import facturas_bp
     from .routes.empleados import empleados_bp
+    from .routes.bodegas import bodegas_bp
     #from .routes.clientes import clientes_bp
 
     app.register_blueprint(auth_bp)
@@ -18,6 +19,7 @@ def create_app():
     app.register_blueprint(pedidos_bp)
     app.register_blueprint(facturas_bp)
     app.register_blueprint(empleados_bp)
+    app.register_blueprint(bodegas_bp)
     #app.register_blueprint(clientes_bp)
 
     return app
